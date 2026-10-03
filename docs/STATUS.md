@@ -2,7 +2,7 @@
 
 | Phase | Status | Date |
 |---|---|---|
-| 1. Setup | 🟡 In progress | |
+| 1. Setup | ✅ Done | 2025-10-19 |
 | 2. Services | ⬜ Not started | |
 | 3. Gateway routing | ⬜ Not started | |
 | 4. JWT auth | ⬜ Not started | |
