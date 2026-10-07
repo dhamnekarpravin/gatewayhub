@@ -1,0 +1,6 @@
+target
+.idea
+.env
+order-service/target
+order-service/.idea
+order-service/.env

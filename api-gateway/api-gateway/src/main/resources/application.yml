@@ -1,0 +1,104 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 5s
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            exposedHeaders: X-Request-Id,X-RateLimit-Limit,X-RateLimit-Remaining,Retry-After
+      routes:
+        - id: user-service
+          uri: ${USER_SERVICE_URL:http://localhost:8001}
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: userServiceCB
+                fallbackUri: forward:/fallback/user-service
+
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://localhost:8002}
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: orderServiceCB
+                fallbackUri: forward:/fallback/order-service
+
+        - id: ml-service
+          uri: ${ML_SERVICE_URL:http://localhost:8003}
+          predicates:
+            - Path=/api/predict/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: mlServiceCB
+                fallbackUri: forward:/fallback/ml-service
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 6
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+    instances:
+      userServiceCB:
+        base-config: default
+      orderServiceCB:
+        base-config: default
+      mlServiceCB:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 6s
+    instances:
+      userServiceCB:
+        base-config: default
+      orderServiceCB:
+        base-config: default
+      mlServiceCB:
+        base-config: default
+
+jwt:
+  secret: ${JWT_SECRET:dev-jwt-secret-must-be-at-least-32-characters-long}
+
+ratelimit:
+  max-requests: ${RATE_LIMIT:100}
+  window-seconds: 60
+
+logging:
+  level:
+    com.gatewayhub.api_gateway: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,gateway,circuitbreakers
+  health:
+    circuitbreakers:
+      enabled: true

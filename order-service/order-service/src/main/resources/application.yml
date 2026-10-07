@@ -5,10 +5,14 @@ spring:
   application:
     name: order-service
   datasource:
-    url: jdbc:mysql://localhost:3306/orders_db
-    username: gh_user
-    password: gh_pass123
+    url: ${DB_URL:jdbc:mysql://localhost:3306/orders_db}
+    username: ${DB_USER:gh_user}
+    password: ${DB_PASSWORD:gh_pass123}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${DDL_AUTO:update}
     show-sql: true
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss} %-5level %logger{20} - %msg%n"

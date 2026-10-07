@@ -1,0 +1,54 @@
+# Environment files (keep examples)
+.env
+.env.dev
+.env.prod
+.env.local
+!.env.example
+!.env.prod.example
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+model.pkl
+
+# Java/Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Node
+node_modules/
+dist/
+.npm/
+.eslintcache
+
+# Docker volumes
+mysql_data/
+
+# Logs
+*.log
+logs/

@@ -1,21 +1,25 @@
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 import joblib
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="GatewayHub ML Service")
-
 MODEL_PATH = Path(__file__).parent / "model.pkl"
 model = None
 
 
-@app.on_event("startup")
-def load_model():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global model
     if not MODEL_PATH.exists():
         raise RuntimeError("model.pkl not found. Run: python train.py")
     model = joblib.load(MODEL_PATH)
+    yield
+    model = None
+
+
+app = FastAPI(title="GatewayHub ML Service", lifespan=lifespan)
 
 
 class PredictRequest(BaseModel):
